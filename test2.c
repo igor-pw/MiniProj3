@@ -15,14 +15,13 @@ int main(int argc, char **argv)
 
 	node_t *temp;
 	temp = init_graph(size, in, out);
-	//print_graph(temp, size, in, out);
-
 	rand_graph(temp[in-1], size, in, out);
-	//print_graph(temp, size, in, out);
 
+	print_status(temp, size, in, out);
 
-	//connect_graph(temp, size, in, out);
 	check_graph(temp[in-1]);
+
+	print_status(temp, size, in, out);
 	
 	for(int i = 0; i < size*size; i++)
 	{
@@ -32,12 +31,16 @@ int main(int argc, char **argv)
 			i = 0;
 			temp = init_graph(size, in, out);
 			rand_graph(temp[in-1], size, in, out);
-			//connect_graph(temp, size, in, out);
+
+			print_status(temp, size, in, out);
+
 			check_graph(temp[in-1]);
+
+			print_status(temp, size, in, out);
 		}
 	}
 
-	print_graph(temp, size, in, out);
+	print_graph(temp, size, in, out, counter);
 
 	free_graph(temp, size);
 }

@@ -14,7 +14,9 @@ typedef struct node
  
 } node_o, *node_t;
 
-void print_graph(node_t *temp, int size, int in, int out);
+void print_status(node_t *temp, int size, int in, int out);
+
+void print_graph(node_t *temp, int size, int in, int out, int couter);
 
 node_t *init_graph(int size, int in, int out);
 

@@ -46,16 +46,16 @@ void print_graph(node_t *temp, int size, int in, int out, int counter)
 
 	for (int i = 0; i < temp[counter]->edge; i++)
 	{
-		if (node->nr+1 == temp[counter]->next_node[i]->nr)
+		if (temp[counter]->nr+1 == temp[counter]->next_node[i]->nr)
 			right = true;
 
-		if (node->nr-1 == temp[counter]->next_node[i]->nr)
+		if (temp[counter]->nr-1 == temp[counter]->next_node[i]->nr)
 			left = true;
 
-		if (node->nr+size == temp[counter]->next_node[i]->nr)
+		if (temp[counter]->nr+size == temp[counter]->next_node[i]->nr)
 			up = true;
 
-		if (node->nr-size == temp[counter->next_node[i]->nr)
+		if (temp[counter]->nr-size == temp[counter]->next_node[i]->nr)
 			down = true;
 			
 	}
@@ -78,14 +78,14 @@ void print_graph(node_t *temp, int size, int in, int out, int counter)
 		printf("|");
 		
 	if (!down)
-		printf("_")
+		printf("_");
 
 	counter++;
 
-	print_graph(temp[counter], size, in out, counter);
+	print_graph(temp, size, in, out, counter);
 
-
-	//printf("\n\n");
+	if(counter + 1 % size == 0 )
+		printf("\n");
 }
 
 
@@ -171,36 +171,36 @@ node_t *init_graph(int size, int in, int out)
 
 	return temp;
 }
+
 void rand_graph(node_t node, int size, int in, int out)
 {
 
 	if(node->edge > 0)
 	{
 		bool *to_connect = malloc(sizeof(bool) * node->edge);
-		int counter = 0;
+		int counter_true = 0;
+		int counter_false = 0;
 
 		for(int i = 0; i < node->edge; i++)
 		{
 			int connection = rand() % 2;
 
-			if(connection == 0 || counter == 2)
+			if(connection == 0 || counter_true == 2)
 			{
 				to_connect[i] = false;
-				counter++;
+				counter_false++;
 			}
 
-			else if(connection == 1)
+			else if(connection == 1 || counter_false == 2)
 			{
 				to_connect[i] = true;
-				//counter++;
+				counter_true++;
 			}
-
-			//counter++;
 		}
 
-		if(counter > 0)
+		if(counter_false > 0)
 		{
-			node_t *tab_to_connect = malloc(sizeof node * counter);
+			node_t *tab_to_connect = malloc(sizeof node * counter_true);
 			int connected = 0;
 			int not_connected = 0;
 
@@ -283,7 +283,7 @@ void rand_graph(node_t node, int size, int in, int out)
 
 	for(int i = 0; i < node->edge; i++)
 	{
-		if(node->next_node[i] != NULL)
+		if(node->next_node != NULL)
 			rand_graph(node->next_node[i], size, in, out);
 	}
 }
