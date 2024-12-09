@@ -4,26 +4,31 @@
 #include <time.h>
 #include "graph2.h"
 
-void print_graph(node_t *temp, int size, int in, int out)
+void print_status(node_t* temp, int size, int in, int out)
 {
-        for(int i = 0; i < size*size; i++)
-        {
-		if(temp[i]->checked)
+	for (int i = 0; i < size * size; i++)
+	{
+		if (temp[i]->checked)
 			printf("| sprawdzone ");
 
 		else
 			printf("| niesprawdzone |");
-                printf("| adres: %p | nr:  %2d | polaczenia: %d | dostepne wierzcholki: ", temp[i], temp[i]->nr, temp[i]->edge);
+		printf("| adres: %p | nr:  %2d | polaczenia: %d | dostepne wierzcholki: ", temp[i], temp[i]->nr, temp[i]->edge);
 
-                for(int j = 0; j < temp[i]->edge; j++)
-                {
-                        printf(" %2d ", temp[i]->next_node[j]->nr);
-                }
-                printf("|\n");
-        }
+		for (int j = 0; j < temp[i]->edge; j++)
+		{
+			printf(" %2d ", temp[i]->next_node[j]->nr);
+		}
+		printf("|\n");
+	}
 
 	printf("\n\n");
-	
+}
+
+
+void print_graph(node_t *temp, int size, int in, int out, int counter)
+{
+     
 	for(int i = 0; i < size; i++)
 	{
 		if(i != in-1)
@@ -32,66 +37,55 @@ void print_graph(node_t *temp, int size, int in, int out)
 			printf("  ");
 	}
 
-	printf("\n|");
-	
-	for(int i = 0; i < size*size; i++)
+	//printf("\n|");
+
+	bool up = false;
+	bool down = false;
+	bool right = false;
+	bool left = false;
+
+	for (int i = 0; i < temp[counter]->edge; i++)
 	{
-		bool lower = true;
-		bool right = true;
-		
-		for(int j = 0; j < temp[i]->edge; j++)
-		{
-			if(temp[i]->next_node[j]->nr > temp[i]->nr)
-			{
-				if(temp[i]->next_node[j]->nr == temp[i]->nr+1)
-				{
-					right = false;
-				}
+		if (node->nr+1 == temp[counter]->next_node[i]->nr)
+			right = true;
 
-				else if(temp[i]->next_node[j]->nr == (temp[i]->nr+size))
-				{	
-					lower = false;
-				}
-			}
+		if (node->nr-1 == temp[counter]->next_node[i]->nr)
+			left = true;
+
+		if (node->nr+size == temp[counter]->next_node[i]->nr)
+			up = true;
+
+		if (node->nr-size == temp[counter->next_node[i]->nr)
+			down = true;
 			
-			else
-				continue;
-		}
-
-		if(temp[i]->nr != out)
-		{
-			if(lower && right)
-				printf("_|");
-              		else if(lower && !right)
-               			printf("_ ");
-        		else if(!lower && right)
-				printf(" |");
-			else
-				printf("  ");
-		}
-
-		else
-		{
-			if(lower && right)
-                                printf(" |");
-                        else if(lower && !right)
-                                printf("  ");
-                        else if(!lower && right)
-                                printf(" |");
-                        else
-                                printf("  ");
-
-		}
-		
-
-		if(temp[i]->nr % size == 0 && temp[i]->nr != size*size)
-		{
-			printf("\n|");
-		}
-
+	}
+	
+	if (!left)
+	{
+		printf("\033]C");
+		printf("|");
+		printf("\033]D");
 	}
 
-	printf("\n\n");
+	if(!up)
+	{
+		printf("\033]B");
+		printf("|");
+		printf("\033]A");
+	}
+
+	if (!left)
+		printf("|");
+		
+	if (!down)
+		printf("_")
+
+	counter++;
+
+	print_graph(temp[counter], size, in out, counter);
+
+
+	//printf("\n\n");
 }
 
 
@@ -192,15 +186,16 @@ void rand_graph(node_t node, int size, int in, int out)
 			if(connection == 0 || counter == 2)
 			{
 				to_connect[i] = false;
+				counter++;
 			}
 
 			else if(connection == 1)
 			{
 				to_connect[i] = true;
-				counter++;
+				//counter++;
 			}
 
-			counter++;
+			//counter++;
 		}
 
 		if(counter > 0)
@@ -243,9 +238,9 @@ void rand_graph(node_t node, int size, int in, int out)
 					node->next_node[i]->edge -= 1;
 					if(node->next_node[i]->edge > 0)
 					{
-						printf("przed realloc: %p ", node->next_node[i]->next_node);
+						//printf("przed realloc: %p ", node->next_node[i]->next_node);
 						node->next_node[i]->next_node = realloc(node->next_node[i]->next_node, sizeof node * node->next_node[i]->edge);
-						printf("po realloc: %p\n", node->next_node[i]->next_node);
+						//printf("po realloc: %p\n", node->next_node[i]->next_node);
 						for(int j = 0; j < node->next_node[i]->edge; j++)
 							node->next_node[i]->next_node[j] = tab[j];
 					}
