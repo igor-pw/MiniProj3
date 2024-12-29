@@ -10,6 +10,7 @@ typedef struct node
 {
 	bool end;
 	bool checked;
+	bool connected;
 	bool up;
 	bool down;
 	bool right;
@@ -20,7 +21,7 @@ typedef struct node
 	struct node **next_node;
 } *node_t;
 
-void print_status(node_t *nodes, int size);
+void print_status(node_t *nodes, int size, int in);
 
 void print_maze(node_t *nodes, int size, int in);
 
@@ -28,7 +29,7 @@ void init_node(node_t *nodes, int size, int out, int index);
 
 void correct_possible_connection(node_t *nodes, int size ,int out);
 
-void connect_graph(node_t *nodes, node_t node, int size, int in);
+void connect_graph(node_t *nodes, node_t node, int size, int in, int *mode);
 
 void check_graph(node_t nodes);
 

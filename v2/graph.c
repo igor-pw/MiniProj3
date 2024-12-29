@@ -1,24 +1,28 @@
 #include "graph.h"
-#include <unistd.h>
+#include "func.h"
 
-void print_status(node_t *nodes, int size)
+void print_status(node_t *nodes, int size, int in)
 {
 	for(int i = 0; i < size*size; i++)
 	{
-		if(nodes[i]->checked)
+		/*if(nodes[i]->checked)
 			printf("| sprawdzone ");
 
 		else
 			printf("| niesprawdzone ");
-
-		printf("| nr: %2d | krawedzie: %d | wierzcholki: ", nodes[i]->nr, nodes[i]->edge); 
+		*/
+		printf("| nr: %2d | polaczenia: ", nodes[i]->nr); 
 	
-		for(int j = 0; j < nodes[i]->edge; j++)
-		{
-			printf(" %2d", nodes[i]->next_node[j]->nr);
-		}
+		if(nodes[i]->edge > 0)
+			for(int j = 0; j < nodes[i]->edge; j++)
+			{
+				printf(" %2d", nodes[i]->next_node[j]->nr);
+			}
 
-		if(nodes[i]->up)
+		else if(nodes[i]->edge == 0)
+			printf(" brak");
+
+		/*if(nodes[i]->up)
 			printf(" | up");
 		if(nodes[i]->down)
 			printf(" | down");
@@ -26,9 +30,19 @@ void print_status(node_t *nodes, int size)
 			printf(" | left");
 		if(nodes[i]->right)
 			printf(" | right");
+		*/
 
-		printf(" |\n");
+		printf(" | ");
 
+
+		if(i == in-1)
+			printf("Wejscie |\n");
+		
+		else if(nodes[i]->end)
+			printf("Wyjscie |\n");
+		
+		else
+			printf("\n");	
 	}
 
 	printf("\n\n");
@@ -36,12 +50,11 @@ void print_status(node_t *nodes, int size)
 
 void print_maze(node_t *nodes, int size, int in)
 {
-	//int n = size*size;
-
 	printf(" ");
 
 	for(int i = 0; i < in-1; i++)
 		printf("_ ");
+
 	printf("  ");
 
 	for(int i = in; i < size; i++)
@@ -56,33 +69,33 @@ void print_maze(node_t *nodes, int size, int in)
 		for(int j = 0; j < size-1; j++)
 		{	
 
-			if(!nodes[j]->down)
+			if(!nodes[j+i*size]->down)
 				{
-					if(!nodes[j+size]->up)
+					if(!nodes[j+i*size+size]->up)
 						printf("_");
 
-					else if(nodes[j+size]->up)
+					else if(nodes[j+i*size+size]->up)
 						printf(" ");
 				}
 
-			else if(nodes[j]->down)
+			else if(nodes[j+i*size]->down)
 				printf(" ");
 			
-			if(!nodes[j]->right)
+			if(!nodes[j+i*size]->right)
 			{
-				if(!nodes[j+1]->left)
+				if(!nodes[j+i*size+1]->left)
 					printf("|");
 				
-				else if(nodes[j+size]->left)	
+				else if(nodes[j+i*size+1]->left)	
 					printf(" ");
 			}
 
-			else if(nodes[j]->right)
+			else if(nodes[j+i*size]->right)
 				printf(" ");
 		}
 
 
-		if(!nodes[size*(i+1)]->down)
+		if(!nodes[size*(i+1)-1]->down)
 		{
 			if(!nodes[size*(i+1)+size-1]->up)
 				printf("_|\n");
@@ -91,7 +104,7 @@ void print_maze(node_t *nodes, int size, int in)
 				printf(" |\n");
 		}
 
-		else if(nodes[size*(i+1)]->down)
+		else if(nodes[size*(i+1)-1]->down)
 			printf(" |\n");
 	
 	}
@@ -111,7 +124,7 @@ void print_maze(node_t *nodes, int size, int in)
 					printf("_ ");
 			}
 
-			else if(nodes[i]->left)
+			else if(nodes[i]->right)
 				printf("_ ");
 		}
 
@@ -162,7 +175,8 @@ void init_node(node_t *nodes, int size, int out, int index)
 	node->checked = false;
 	node->edge = 0;
 	node->end = false;
-	
+	node->connected = false;
+
 	if(index == out - 1)
 		node->end = true;
 
@@ -249,138 +263,37 @@ void correct_possible_connection(node_t *nodes, int size, int out)
 	return;
 }
 
-void connect_graph(node_t *nodes, node_t node, int size, int in)
+void connect_graph(node_t *nodes, node_t node, int size, int in, int *mode)
 {
 	node->checked = true;	
-	int to_connect; //= node->possible_connection;
-	
+	int value;
+
 	if(node->up)
 	{
-		if(!nodes[node->nr-size-1]->checked)
-		{
-			if(nodes[node->nr-size-1]->possible_connection <= 3)
-			{
-				nodes[node->nr-size-1]->down = false;
-				//nodes[node->nr-size-1]->checked = true;
-				node->edge++;
-			}
-
-			else
-			{
-				to_connect = rand() % 2;
-
-				if(to_connect == 0)
-				{
-					nodes[node->nr-size-1]->possible_connection--;
-					node->up = false;
-				}
-		
-					else if(to_connect == 1)
-				{
-					nodes[node->nr-size-1]->down = false;
-					//nodes[node->nr-size-1]->checked = true;
-					node->edge++;
-				}
-			}
-		}
+		value = -size-1;
+		connect_node(nodes, node, value, &node->up, &nodes[node->nr+value]->down, mode);
 	}
+	
 
 	if(node->down)
 	{
-		if(!nodes[node->nr+size-1]->checked)
-		{
-		
-			if(nodes[node->nr+size-1]->possible_connection <= 3)
-			{
-				nodes[node->nr+size-1]->up = false;
-				//nodes[node->nr+size-1]->checked = true;
-				node->edge++;
-			}
-			
-			else
-			{
-				to_connect = rand() % 2;
-
-				if(to_connect == 0)
-				{
-					nodes[node->nr+size-1]->possible_connection--;
-					node->down = false;
-				}
-		
-				else if(to_connect == 1)
-				{
-					nodes[node->nr+size-1]->up = false;
-					//nodes[node->nr+size-1]->checked = true;
-					node->edge++;
-				}
-			}
-		}
+		value = size-1;
+		connect_node(nodes, node, value, &node->down, &nodes[node->nr+value]->up, mode);
 	}
-
+	
+	
 	if(node->left)
 	{
-		if(!nodes[node->nr-2]->checked)
-		{
-			if(nodes[node->nr-2]->possible_connection <= 3)
-			{
-				nodes[node->nr-2]->right = false;
-				//nodes[node->nr-2]->checked = true;
-				node->edge++;
-			}
-		
-	
-			else
-			{
-				to_connect = rand() % 2;
-
-				if(to_connect == 0)
-				{
-					nodes[node->nr-2]->possible_connection--;
-					node->left = false;	
-				}
-		
-				else if(to_connect == 1)
-				{
-					nodes[node->nr-2]->right = false;
-					//nodes[node->nr-2]->checked = true;
-					node->edge++;
-				}
-			}
-		}
+		value = -2;
+		connect_node(nodes, node, value, &node->left, &nodes[node->nr+value]->right, mode);
 	}
-
+	
 	if(node->right)
 	{
-		if(!nodes[node->nr]->checked)
-		{
-			if(nodes[node->nr]->possible_connection <= 3)
-			{
-				nodes[node->nr]->left = false;
-				//nodes[node->nr]->checked = true;
-				node->edge++;
-			}
-		
-			else
-			{	
-				to_connect = rand() % 2;
-
-				if(to_connect == 0)
-				{
-					nodes[node->nr]->possible_connection--;
-					node->right = false;
-				}
-			
-				else if(to_connect == 1)
-				{
-					nodes[node->nr]->left = false;
-					//nodes[node->nr]->checked = true;
-					node->edge++;
-				}
-			}
-		}
+		value = 0;
+		connect_node(nodes, node, value, &node->right, &nodes[node->nr+value]->left, mode);
 	}
 
-	//int counter = 0;
 	if(node->edge > 0)
 	{
 		node->next_node = malloc(sizeof node * node->edge);
@@ -413,14 +326,12 @@ void connect_graph(node_t *nodes, node_t node, int size, int in)
 
 	}
 
-	//print_status(nodes, size);	
-
 	if(node->edge > 0)
 	{
 		for(int i = 0; i < node->edge; i++)
 		{
 			if(!node->next_node[i]->checked)
-				connect_graph(nodes, node->next_node[i], size, in); 
+				connect_graph(nodes, node->next_node[i], size, in, mode); 
 		}
 	}
 
@@ -440,10 +351,9 @@ void connect_graph(node_t *nodes, node_t node, int size, int in)
 			node->right = true;
 		}
 	
-		connect_graph(nodes, node, size, in);
+		connect_graph(nodes, node, size, in, mode);
 	}
 }
-
 
 void free_graph(node_t *nodes, int n)
 {
