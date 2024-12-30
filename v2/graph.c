@@ -1,16 +1,12 @@
 #include "graph.h"
 #include "func.h"
 
-void print_status(node_t *nodes, int size, int in)
+void print_status(node_t *nodes, int size)
 {
+	printf("\n");
+	
 	for(int i = 0; i < size*size; i++)
 	{
-		/*if(nodes[i]->checked)
-			printf("| sprawdzone ");
-
-		else
-			printf("| niesprawdzone ");
-		*/
 		printf("| nr: %2d | polaczenia: ", nodes[i]->nr); 
 	
 		if(nodes[i]->edge > 0)
@@ -22,27 +18,7 @@ void print_status(node_t *nodes, int size, int in)
 		else if(nodes[i]->edge == 0)
 			printf(" brak");
 
-		/*if(nodes[i]->up)
-			printf(" | up");
-		if(nodes[i]->down)
-			printf(" | down");
-		if(nodes[i]->left)
-			printf(" | left");
-		if(nodes[i]->right)
-			printf(" | right");
-		*/
-
-		printf(" | ");
-
-
-		if(i == in-1)
-			printf("Wejscie |\n");
-		
-		else if(nodes[i]->end)
-			printf("Wyjscie |\n");
-		
-		else
-			printf("\n");	
+		printf(" |\n");
 	}
 
 	printf("\n\n");
@@ -263,7 +239,7 @@ void correct_possible_connection(node_t *nodes, int size, int out)
 	return;
 }
 
-void connect_graph(node_t *nodes, node_t node, int size, int in, int *mode)
+void connect_graph(node_t *nodes, node_t node, int size, int in, int mode)
 {
 	node->checked = true;	
 	int value;
