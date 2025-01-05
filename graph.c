@@ -1,27 +1,27 @@
 #include "graph.h"
 #include "func.h"
 
-void print_status(node_t *nodes, int size)
+void save_status(node_t *nodes, int size)
 {
-	printf("\n");
+	FILE *out = fopen("status.txt", "w");
 	
 	for(int i = 0; i < size*size; i++)
 	{
-		printf("| nr: %2d | polaczenia: ", nodes[i]->nr); 
+		fprintf(out, "| nr: %2d | waga: %.3g | polaczenia:", nodes[i]->nr, nodes[i]->wage); 
 	
 		if(nodes[i]->edge > 0)
 			for(int j = 0; j < nodes[i]->edge; j++)
 			{
-				printf(" %2d", nodes[i]->next_node[j]->nr);
+				fprintf(out, " %2d", nodes[i]->next_node[j]->nr);
 			}
 
 		else if(nodes[i]->edge == 0)
-			printf(" brak");
+			fprintf(out, " brak");
 
-		printf(" |\n");
+		fprintf(out, " |\n");	
 	}
 
-	printf("\n\n");
+	fclose(out);
 }
 
 void print_maze(node_t *nodes, int size, int in)
@@ -146,10 +146,11 @@ void init_node(node_t *nodes, int size, int out, int index)
 	}
 
 	node_t node = malloc(sizeof *node);
-
-	node->nr = index+1;
-	node->checked = false;
+	
+	node->nr = index+1;	
 	node->edge = 0;
+	node->wage = generate_wage();	
+	node->checked = false;
 	node->end = false;
 	node->connected = false;
 
@@ -160,54 +161,8 @@ void init_node(node_t *nodes, int size, int out, int index)
 	node->down = true;
 	node->right = true;
 	node->left = true;
-
-	if((node->nr == 1) || node->nr == size || node->nr == ((size-1)*size+1) || node->nr == size*size)
-	{
-		node->possible_connection = 2;
-
-		if(node->nr == 1)
-		{
-			node->up = false;
-			node->left = false;
-		}
-
-		else if(node->nr == size)
-		{
-			node->up = false;
-			node->right = false;
-		}
-
-		else if(node->nr == ((size-1)*size+1))
-		{
-			node->down = false;
-			node->left = false;
-		}
-
-		else if(node->nr == size*size)
-		{
-			node->right = false;
-			node->down = false;
-		}
-	}
-	else if((node->nr > 1 && node->nr < size) || (node->nr > (size-1)*size+1 && node->nr < size*size) || (node->nr % size <= 1 && (node->nr != 1 || node->nr != (size-1)*size+1 || node->nr != size || node->nr != size*size)))
-	{
-		node->possible_connection = 3;
-
-		if(node->nr > 1 && node->nr < size)
-			node->up = false;
-
-		else if(node->nr > (size-1)*size+1 && node->nr < size*size)
-			node->down = false;
-
-		else if(node->nr % size == 1)
-			node->left = false;
-
-		else if(node->nr % size == 0)
-			node->right = false;
-	}
-
-	else
-		node->possible_connection = 4;
+	
+	correct_directions(node, size);
 
 	nodes[index] = node;	
 
@@ -344,6 +299,4 @@ void free_graph(node_t *nodes, int n)
 			free(nodes[i]);
 		}
 	}
-
-	//free(nodes);
 }

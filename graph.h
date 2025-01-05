@@ -16,12 +16,13 @@ typedef struct node
 	bool right;
 	bool left;
 	int nr;
+	double wage;
 	int edge;
 	int possible_connection;
 	struct node **next_node;
 } *node_t;
 
-void print_status(node_t *nodes, int size);
+void save_status(node_t *nodes, int size);
 
 void print_maze(node_t *nodes, int size, int in);
 
