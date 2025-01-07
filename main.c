@@ -4,9 +4,9 @@
 #include "graph.h"
 #include "func.h"
 
-#define TIME 15 
-#define MAX_SIZE 361
-#define MIN_SIZE 3
+#define TIME 15 	//czas oczekiwania w sekundach 
+#define MAX_SIZE 361 	//maksynalny rozmiar labiryntu
+#define MIN_SIZE 3	//minimalny rozmiar labiryntu
 
 int main()
 {
@@ -39,13 +39,13 @@ int main()
 
 	//odczyt trybu lub jego automatyczne wybranie
 	scan_value(string, number, 3);
-	mode = *string == 'y' ? atoi(number) : select_mode(size, MAX_SIZE);
+	mode = *string == 'y' ? atoi(number) : select_mode(size, MIN_SIZE, MAX_SIZE);
 
 	//kalibracja wyjscia labiryntu
 	out += size*size - size;
 
 	//sprawdzene poprawnosci trybu
-	check_mode(&mode, size, MAX_SIZE);
+	check_mode(&mode, size, MIN_SIZE, MAX_SIZE);
 
 	//ilosc wierzcholkow grafu
 	int n = size*size;
@@ -109,7 +109,7 @@ int main()
 					pthread_join(timer_thread, NULL);
 
 					//zapytanie o zmiane recznie wybranego trybu
-					choice = change_mode(size, &mode, MAX_SIZE);
+					choice = change_mode(size, &mode, MIN_SIZE, MAX_SIZE);
 					
 					printf("\nGenerowanie labiryntu...\n");
 				}

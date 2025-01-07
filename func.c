@@ -2,10 +2,10 @@
 #include "func.h"
 #include <unistd.h>
 
-double generate_wage()
+double generate_weight()
 {
 	//losowanie liczby jednosci wagi
-	double wage = rand() % 5;
+	double weight = rand() % 5;
         
 	int temp = 0;
 
@@ -14,7 +14,7 @@ double generate_wage()
 
         double decimal = temp;
 
-	return wage+decimal/100;
+	return weight+decimal/100;
 }
 
 void correct_directions(node_t node, int size)
@@ -137,10 +137,10 @@ void connect_node(node_t *nodes, node_t node, int value, bool *direction, bool *
 	}
 }
 
-int select_mode(int size, int max)
+int select_mode(int size, int min, int max)
 {		
 	//wybor trybu 1, 2 lub 3
-	if(size > 2 && size <= 10)
+	if(size >= min && size <= 10)
 	      	return 1;
 
 	else if(size > 10 && size <= 25)
@@ -206,7 +206,7 @@ int check_value(char *choice, int min, int max, int index)
 	return value;
 }
 
-void check_mode(int *mode, int size, int max)
+void check_mode(int *mode, int size, int min, int max)
 {
 	system("clear");
 	
@@ -251,13 +251,13 @@ void check_mode(int *mode, int size, int max)
 			system("clear");
 
 			printf("\nAutomatyczne wybieranie trybu...\n");
-                        *mode = select_mode(size, max);
+                        *mode = select_mode(size, min, max);
                 }
 
         }
 }
 
-int change_mode(int size, int *mode, int max)
+int change_mode(int size, int *mode, int min, int max)
 {
 	char *choice = malloc(sizeof choice);
 
@@ -284,7 +284,7 @@ int change_mode(int size, int *mode, int max)
 		system("clear");	
 
 		printf("\nAutomatyczne wybieranie trybu...\n");
-		*mode = select_mode(size, max);
+		*mode = select_mode(size, min, max);
 	}
 
 	return 1;

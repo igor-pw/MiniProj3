@@ -8,7 +8,7 @@ void save_status(node_t *nodes, int size)
 	//zapisanie statusu kazdego wierzcholka do pliku
 	for(int i = 0; i < size*size; i++)
 	{
-		fprintf(out, "| nr: %2d | waga: %.2f | polaczenia:", nodes[i]->nr, nodes[i]->wage); 
+		fprintf(out, "| nr: %2d | waga: %.2f | polaczenia:", nodes[i]->nr, nodes[i]->weight); 
 	
 		if(nodes[i]->edge > 0)
 			for(int j = 0; j < nodes[i]->edge; j++)
@@ -160,7 +160,7 @@ void init_node(node_t *nodes, int size, int out, int index)
 	//przypisanie wartosci zmiennych w strukturze
 	node->nr = index+1;	
 	node->edge = 0;
-	node->wage = generate_wage();	
+	node->weight = generate_weight();	
 	node->checked = false;
 	node->end = false;
 	node->connected = false;

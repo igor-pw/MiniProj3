@@ -1,7 +1,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-double generate_wage();
+double generate_weight();
 
 void correct_directions(node_t node, int size);
 
@@ -9,11 +9,11 @@ void connect_node(node_t *nodes, node_t node, int value, bool *direct, bool *opp
 
 int check_value(char *choice, int min, int max, int index);
 
-int select_mode(int size, int max);
+int select_mode(int size, int min, int max);
 
-void check_mode(int *mode, int size, int max);
+void check_mode(int *mode, int size, int min, int max);
 
-int change_mode(int size, int *mode, int max);
+int change_mode(int size, int *mode, int min, int max);
 
 void check_answer(char* choice);
 

@@ -16,7 +16,7 @@ typedef struct node
 	bool right;
 	bool left;
 	int nr;
-	double wage;
+	double weight;
 	int edge;
 	int possible_connection;
 	struct node **next_node;
