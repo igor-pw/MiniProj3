@@ -3,6 +3,7 @@
 #include <signal.h>
 #include "graph.h"
 #include "func.h"
+#include "search.h"
 
 #define TIME 15 	//czas oczekiwania w sekundach 
 #define MAX_SIZE 361 	//maksynalny rozmiar labiryntu
@@ -144,16 +145,79 @@ int main()
 	printf("Rozmiar labiryntu: %dx%d\n", size, size);
 	
 	//zapisanie statusu wierzcholkow labiryntu do pliku
-	save_status(nodes, size);	
-
-	//zwolnienie pamieci
-	free_graph(nodes, n);
-	free(nodes);
-
+	save_status(nodes, size);
+	
 	//zwolnienie watku czasomierza
 	if(!first)
 	{
 		pthread_cancel(timer_thread);	
 		pthread_join(timer_thread, NULL);
 	}
+
+	//przeszukiwanie labiryntu w celu znalezienia sciezki od wejscia do wyjscia
+
+	//zmienna okreslajaca czy wyjscie zostalo znalezione
+	bool found = false;
+	
+	//wierzcholek startowy, z ktorego szukane jest wyjscie
+	node_t start_node = nodes[in-1];
+	
+	//wierzcholek startowy uzywany w funkcji find_exit
+	node_t temp = nodes[in-1];
+
+	//waga startowa sciezki
+	double path_weight = start_node->weight;
+
+	//otworzenie pliku, do ktorego zapisana zostanie sciezka
+	FILE *path = fopen("path.txt", "w");
+
+	//zapisanie startu sciezki do pliku
+	fprintf(path, "Sciezka labiryntu: %d", start_node->nr);
+
+	printf("\nPrzeszukiwanie labiryntu...\n");
+
+	//przeszukiwanie labiryntu do momentu, w ktorym sciezka startowa jest wyjsciem
+	while(start_node != nodes[out-1])
+	{
+		//przeszukiwanie sciezki dla kazdego wierzcholka polaczonego z wierzcholkiem startowym
+		for(int i = 0; i < start_node->edge; i++)
+		{
+			//wierzcholki, ktore maja przejscie
+			if(start_node->edge > 0)
+			{
+				//szukanie wyjscie
+				find_exit(temp->next_node[i], &found);
+
+				//sciezka zostala znaleziona
+				if(found)
+				{
+					//zapisanie nr wierzcholka do pliku oraz dodanie wagi
+					fprintf(path, " -> %d", start_node->next_node[i]->nr);
+					path_weight += start_node->next_node[i]->weight;
+
+					found = false;
+
+					//zmiana wierzcholka startowego na ten, z ktorego znalezione zostalo wyjscie
+					start_node = start_node->next_node[i];
+					temp = start_node;
+					break;
+				}
+			}
+	
+		}
+	}
+
+	//zapisanie wagi sciezki do pliku
+	fprintf(path, "\n\nWaga sciezki: %.2f", path_weight);
+
+	//wypisanie wagi sciezki w konsoli
+	printf("\nWaga sciezki: %.2f\n\n", path_weight);
+
+	//zamkniecie pliku
+	fclose(path);
+
+	//zwolnienie pamieci
+	free_graph(nodes, n);
+	free(nodes);
+
 }
